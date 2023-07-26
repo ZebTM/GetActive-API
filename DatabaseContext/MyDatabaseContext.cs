@@ -22,4 +22,5 @@ public class MyDatabaseContext : DbContext
 
     public DbSet<Workout> workouts { get; set; }
     public DbSet<Exercise> exercises { get; set; }
+    public DbSet<Post> fitness_posts { get; set; }
 }

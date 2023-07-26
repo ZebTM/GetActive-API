@@ -8,7 +8,6 @@ public class Exercise
     public Guid Id { get; set; }
     [Column("workoutid")]
     public Guid WorkoutId { get; set; } 
-    public Workout Workout { get; set; }
     [Column("title")]
     public string Title { get; set; } = String.Empty;
     [Column("sets")]

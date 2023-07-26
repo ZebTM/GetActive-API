@@ -39,6 +39,29 @@ public class WorkoutController : ControllerBase
         }
     }
 
+    [HttpGet("id")]
+    public async Task<IActionResult> GetWorkout(Guid id)
+    {
+        try {
+            Workout? tmpWorkout = await _dbcontext.workouts.FindAsync(id);
+            if (tmpWorkout == null)
+            {
+                return Ok();
+            }
+            List<Exercise> exercises = _dbcontext.exercises.Where(e => e.WorkoutId == tmpWorkout.Id).ToList();
+            WorkoutViewModel workout = new WorkoutViewModel()
+            {
+                Id = tmpWorkout.Id,
+                Title = tmpWorkout.Title,
+                Exercises = exercises
+            };
+            return Ok(workout);
+        } catch (Exception e)
+        {
+            return BadRequest(e);
+        }
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateWorkout(NewWorkout _workout)
     {
@@ -82,7 +105,7 @@ public class WorkoutController : ControllerBase
         if (workout != null)
         {  
             List<Exercise> exercise = _dbcontext.exercises.Where(e => e.WorkoutId == workout.Id).ToList<Exercise>();
-            
+
             exercise.ForEach(e => _dbcontext.exercises.Remove(e));
             _dbcontext.workouts.Remove(workout);
 
