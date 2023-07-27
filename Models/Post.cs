@@ -4,24 +4,16 @@ namespace GetActive_API.Models;
 
 public class Post
 {
-    [Column("id")]
-    public Guid Id { get; set; }
-    [Column("title")]
-    public string Title { get; set; } = String.Empty;
-    [Column("description")]
-
-    public string Description { get; set; } = String.Empty;
-    [Column("workoutid")]
-    public Guid WorkoutId { get; set; }
+    public Guid id { get; set; }
+    public string title { get; set; } = String.Empty;
+    public string description { get; set; } = String.Empty;
+    public Guid workoutid { get; set; }
+    public Workout Workout { get; set; }
 }
 
 public class NewPost
 {
-    [Column("title")]
     public string Title { get; set; } = String.Empty;
-    [Column("description")]
-
     public string Description { get; set; } = String.Empty;
-    [Column("workoutid")]
     public Guid WorkoutId { get; set; }
 }

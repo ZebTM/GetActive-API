@@ -1,19 +1,14 @@
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System.ComponentModel.DataAnnotations;
 namespace GetActive_API.Models;
 
 public class Exercise
 {
-    [Column("id")]
-    public Guid Id { get; set; }
-    [Column("workoutid")]
-    public Guid WorkoutId { get; set; } 
-    [Column("title")]
-    public string Title { get; set; } = String.Empty;
-    [Column("sets")]
-    public int Sets { get; set; } = 0;
-    [Column("reps")]
-    public int Reps { get; set; } = 0;
+    public Guid id { get; set; }
+    public string title { get; set; } = String.Empty;
+    public int sets { get; set; } = 0;
+    public int reps { get; set; } = 0;
+    public Guid workoutid { get; set; } 
 }
 
 public class ExerciseModel

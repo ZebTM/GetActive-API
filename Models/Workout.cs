@@ -8,6 +8,7 @@ public class Workout
     public Guid Id { get; set; }
     [Column("title")]
     public string Title { get; set; } = String.Empty;
+    public ICollection<Exercise> Exercises { get; } = new List<Exercise>();
 }
 
 public class WorkoutViewModel

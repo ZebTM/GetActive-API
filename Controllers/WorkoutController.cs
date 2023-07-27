@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using GetActive_API.Models;
 using GetActive_API.DatabaseContext;
-
+using Microsoft.EntityFrameworkCore;
 namespace GetActive_API.Controllers;
 
 [ApiController]
@@ -19,18 +19,9 @@ public class WorkoutController : ControllerBase
     public async Task<IActionResult> GetWorkouts()
     {
         try {
-            List<Workout> tmpWorkouts = _dbcontext.workouts.ToList();
-            List<WorkoutViewModel> workouts = new List<WorkoutViewModel>();
-            for(int i = 0; i < tmpWorkouts.Count - 1; i++)
-            {   
-                WorkoutViewModel newWorkout = new WorkoutViewModel()
-                {
-                    Id = tmpWorkouts[i].Id,
-                    Title = tmpWorkouts[i].Title,
-                    Exercises = _dbcontext.exercises.Where(exercise => exercise.WorkoutId == tmpWorkouts[i].Id)
-                };
-                workouts.Add(newWorkout);
-            }
+            List<Workout> workouts = _dbcontext.workouts
+                .Include(w => w.Exercises)
+                .ToList();
 
             return Ok(workouts);
         } catch (Exception e)
@@ -43,18 +34,10 @@ public class WorkoutController : ControllerBase
     public async Task<IActionResult> GetWorkout(Guid id)
     {
         try {
-            Workout? tmpWorkout = await _dbcontext.workouts.FindAsync(id);
-            if (tmpWorkout == null)
-            {
-                return Ok();
-            }
-            List<Exercise> exercises = _dbcontext.exercises.Where(e => e.WorkoutId == tmpWorkout.Id).ToList();
-            WorkoutViewModel workout = new WorkoutViewModel()
-            {
-                Id = tmpWorkout.Id,
-                Title = tmpWorkout.Title,
-                Exercises = exercises
-            };
+            Workout? workout = await _dbcontext.workouts
+                .Include(w => w.Exercises)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             return Ok(workout);
         } catch (Exception e)
         {
@@ -79,11 +62,11 @@ public class WorkoutController : ControllerBase
             {
                 Exercise exercise = new Exercise()
                 {
-                    Id = Guid.NewGuid(),
-                    WorkoutId = id,
-                    Title = _exercise.Title,
-                    Sets = _exercise.Sets,
-                    Reps = _exercise.Reps
+                    id = Guid.NewGuid(),
+                    workoutid = id,
+                    title = _exercise.Title,
+                    sets = _exercise.Sets,
+                    reps = _exercise.Reps
                 };
                 
                 await _dbcontext.exercises.AddAsync(exercise);
@@ -104,7 +87,7 @@ public class WorkoutController : ControllerBase
         Workout? workout = await _dbcontext.workouts.FindAsync(Id);
         if (workout != null)
         {  
-            List<Exercise> exercise = _dbcontext.exercises.Where(e => e.WorkoutId == workout.Id).ToList<Exercise>();
+            List<Exercise> exercise = _dbcontext.exercises.Where(e => e.workoutid == workout.Id).ToList<Exercise>();
 
             exercise.ForEach(e => _dbcontext.exercises.Remove(e));
             _dbcontext.workouts.Remove(workout);

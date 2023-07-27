@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using GetActive_API.Models;
 using GetActive_API.DatabaseContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace GetActive_API.Controllers;
 
@@ -19,7 +20,12 @@ public class PostController : ControllerBase
     public async Task<IActionResult> GetPosts()
     {
         try {
-            return Ok(_dbcontext.fitness_posts.ToList());
+            List<Post> posts = _dbcontext.fitness_posts
+                .Include(p => p.Workout)
+                .Include(w => w.Workout.Exercises)
+                .ToList();
+
+            return Ok(posts);
         } catch (Exception e)
         {
             return BadRequest(e);
@@ -27,9 +33,19 @@ public class PostController : ControllerBase
     }
 
     [HttpGet("id")]
-    public async Task<IActionResult> GetPost(Guid Id)
+    public async Task<IActionResult> GetPost(Guid id)
     {
-        return Ok(await _dbcontext.fitness_posts.FindAsync(Id));
+        try {
+            Post? post = await _dbcontext.fitness_posts
+                .Include(w => w.Workout)
+                .Include(p => p.Workout.Exercises)
+                .FirstOrDefaultAsync(x => x.id == id);
+
+            return Ok(post);
+        } catch (Exception e)
+        {
+            return BadRequest(e);
+        }
     }
 
     [HttpPost]
@@ -39,10 +55,10 @@ public class PostController : ControllerBase
             Guid id = Guid.NewGuid();
             Post post = new Post()
             {
-                Id = id,
-                Title = _post.Title,
-                Description = _post.Description,
-                WorkoutId = _post.WorkoutId
+                id = id,
+                title = _post.Title,
+                description = _post.Description,
+                workoutid = _post.WorkoutId
             };
 
             await _dbcontext.fitness_posts.AddAsync(post);

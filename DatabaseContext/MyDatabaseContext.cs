@@ -19,6 +19,9 @@ public class MyDatabaseContext : DbContext
         optionsBuilder.UseNpgsql(_configuration.GetConnectionString("GetActiveDatabase"));
     }
 
+    // protected override void OnModelCreating(ModelBuilder modelBuilder)
+    // {
+    // }
 
     public DbSet<Workout> workouts { get; set; }
     public DbSet<Exercise> exercises { get; set; }
